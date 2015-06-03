@@ -1,4 +1,21 @@
 Rails.application.routes.draw do
+
+  root 'welcome#index'
+
+  get '/login' => 'sessions#new'
+  get '/logout' => 'sessions#destroy'
+
+  namespace :api do
+    resources :cities, except: [:destroy, :update] do
+      resources :tips, except: [:destroy, :update]
+    end
+    resources :users, except: [:destroy] do
+      resources :favorites, except: [:destroy, :update]
+    end
+  end
+
+  resource :sessions, except: [:update]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
