@@ -36,6 +36,9 @@ gem 'less-rails'
 gem 'autoprefixer-rails'
 gem 'semantic-ui-rails'
 
+# HTTParty for API calls
+gem 'httparty', '~> 0.13.5'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
