@@ -29,7 +29,11 @@ gem 'react-rails', '~> 1.0.0'
 gem 'backbone-rails'
 # Underscore
 gem 'underscore-rails'
-# Semantic UI
+
+# Semantic UI (with dependencies)
+gem 'therubyracer', '~> 0.12.2'
+gem 'less-rails'
+gem 'autoprefixer-rails'
 gem 'semantic-ui-rails'
 
 # Use ActiveModel has_secure_password
