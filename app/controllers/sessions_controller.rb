@@ -28,6 +28,9 @@ class SessionsController < ApplicationController
   FACEBOOK_TOKEN_URI = 'https://graph.facebook.com/v2.3/oauth/access_token?'
   FACEBOOK_API_URI = 'https://graph.facebook.com/me'
 
+  #ENV["FACEBOOK_LOOPED_OAUTH_ID"]
+  #ENV["FACEBOOK_LOOPED_OAUTH_SECRET"]
+
 
   def redirect_uri
     root_url[0..-2] + oauth_callback_path
@@ -47,11 +50,10 @@ class SessionsController < ApplicationController
     query_params = URI.encode_www_form({
         :code => params[:code],
         :client_id  => 927367780617811,
-        :client_secret => FACEBOOK_LOOPED_OAUTH_SECRET,
+        :client_secret => ENV["FACEBOOK_LOOPED_OAUTH_SECRET"],
         :redirect_uri  => redirect_uri,
         :response_type => 'token'
       })
-    puts FACEBOOK_TOKEN_URI + query_params
     response = HTTParty.post FACEBOOK_TOKEN_URI + query_params
     response['access_token']
   end
@@ -64,16 +66,16 @@ class SessionsController < ApplicationController
       },
       format: :json
     }
-      # Return credentials
-      return {
-        access_token: token,
-        facebook_id: response['id'],
-        first_name: response['first_name'],
-        # last_name: response['last_name'],
-        # email: response['email'],
-        # picture: response['picture']
-        # NEED TO ADD FRIENDS
-      }
+      # Return credentials - just testing id & first_name for now
+    return {
+      access_token: token,
+      facebook_id: response['id'],
+      first_name: response['first_name'],
+      # last_name: response['last_name'],
+      # email: response['email'],
+      # picture: response['picture']
+      # NEED TO ADD FRIENDS
+    }
   end
 
   def log_in_user_by(credentials)
