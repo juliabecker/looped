@@ -25,7 +25,7 @@ class SessionsController < ApplicationController
   helper_method :code_uri
 
   FACEBOOK_CODE_URI = 'https://www.facebook.com/dialog/oauth'
-  FACEBOOK_TOKEN_URI = 'https://www.facebook.com/connect/login_success.html#access_token'
+  FACEBOOK_TOKEN_URI = 'https://graph.facebook.com/v2.3/oauth/access_token?'
   FACEBOOK_API_URI = 'https://graph.facebook.com/me'
 
 
@@ -36,25 +36,23 @@ class SessionsController < ApplicationController
   def code_uri
     query_params = "?" + URI.encode_www_form({
       response_type: 'code',
-      client_id:     927367780617811,
-      redirect_uri:  redirect_uri,
-      scope:         'email,user_friends'
+      client_id: 927367780617811,
+      redirect_uri: redirect_uri,
+      scope: 'public_profile,email,user_friends'
     })
-      FACEBOOK_CODE_URI + query_params
+    FACEBOOK_CODE_URI + query_params
   end
 
   def request_token
-    response = HTTParty.post FACEBOOK_TOKEN_URI, {
-      body: {
+    query_params = URI.encode_www_form({
+        :code => params[:code],
         :client_id  => 927367780617811,
+        :client_secret => FACEBOOK_LOOPED_OAUTH_SECRET,
         :redirect_uri  => redirect_uri,
-      :response_type => "token"
-      }
-      # headers: {
-      #   'Accept' => 'application/json'
-      # },
-      # format: :json # parse the response as JSON
-      }
+        :response_type => 'token'
+      })
+    puts FACEBOOK_TOKEN_URI + query_params
+    response = HTTParty.post FACEBOOK_TOKEN_URI + query_params
     response['access_token']
   end
 

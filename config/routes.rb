@@ -3,9 +3,11 @@ Rails.application.routes.draw do
   # root 'welcome#index'
 
   root 'sessions#new'
+
+  get 'home' => 'welcome#index'
   # get '/login' => 'sessions#new'
   get '/logout' => 'sessions#destroy'
-  get "/oauth_callback" => "sessions#create"
+  get '/oauth_callback' => 'sessions#create'
 
   namespace :api do
     resources :cities, except: [:destroy, :update] do
