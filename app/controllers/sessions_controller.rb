@@ -28,9 +28,8 @@ class SessionsController < ApplicationController
   FACEBOOK_TOKEN_URI = 'https://graph.facebook.com/v2.3/oauth/access_token?'
   FACEBOOK_API_URI = 'https://graph.facebook.com/me'
 
-  #ENV["FACEBOOK_LOOPED_OAUTH_ID"]
-  #ENV["FACEBOOK_LOOPED_OAUTH_SECRET"]
-
+  #FACEBOOK_LOOPED_OAUTH_ID
+  #FACEBOOK_LOOPED_OAUTH_SECRET
 
   def redirect_uri
     root_url[0..-2] + oauth_callback_path
@@ -39,7 +38,7 @@ class SessionsController < ApplicationController
   def code_uri
     query_params = "?" + URI.encode_www_form({
       response_type: 'code',
-      client_id: 927367780617811,
+      client_id: FACEBOOK_LOOPED_OAUTH_ID,
       redirect_uri: redirect_uri,
       scope: 'public_profile,email,user_friends'
     })
@@ -49,13 +48,14 @@ class SessionsController < ApplicationController
   def request_token
     query_params = URI.encode_www_form({
         :code => params[:code],
-        :client_id  => 927367780617811,
-        :client_secret => ENV["FACEBOOK_LOOPED_OAUTH_SECRET"],
+        :client_id  => FACEBOOK_LOOPED_OAUTH_ID,
+        :client_secret => FACEBOOK_LOOPED_OAUTH_SECRET,
         :redirect_uri  => redirect_uri,
         :response_type => 'token'
       })
     response = HTTParty.post FACEBOOK_TOKEN_URI + query_params
     response['access_token']
+    byebug
   end
 
   def get_credentials_with(token)
