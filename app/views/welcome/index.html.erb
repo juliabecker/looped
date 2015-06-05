@@ -1,25 +1,61 @@
-<div class="ui secondary pointing menu">
-  <a class="ui item">
+<div data-id="menu" class="ui secondary pointing menu">
+  <a data-id="add-tip-button" class="ui item">
     Add Tip
   </a>
   <div class="right menu">
     <a class="ui item">
       <img id="menu-image" src="<%= @user.picture %>">
     </a>
-    <a class="ui item">
-      Logout
-    </a>
+    <%= link_to 'Logout', '/sessions', method: :delete, class: "ui item" %>
   </div>
 </div>
-<main class="ui centered page grid">
+<header class="ui centered page grid">
   <div class="row">
     <a href="/"><%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %></a>
   </div>
-  <div id="dropdown-row" class="row"></div>
+</header>
+<main id="main" class="ui centered page grid">
 
-
-
-</main>
+<!-- Add Tip Form -->
+<script type="text/template" data-id="add-tip=template">
+  <div class="ten wide column">
+    <div class="ui form">
+      <div class="field">
+        <div name="city-dropdown" class="ui fluid search selection dropdown">
+          <input type="hidden" name="city">
+          <i class="dropdown icon"></i>
+          <div class="default text">Select City</div>
+            <div data-attr="city-dropdown" class="menu">
+              <%% _.each(cities, function(city) { %>
+                <div class="item" data-value="<%%= city.id %>"><%%= city.city %>, <%%= city.country %></div>
+              <%% }); %>
+                <div class="item" data-value="add-new" style="font-style:italic">Add New City</div>
+            </div>
+          </div>
+      </div>
+      <div class="field">
+        <div name="category-dropdown" class="ui fluid search selection dropdown">
+          <input type="hidden" name="category">
+          <i class="dropdown icon"></i>
+          <div class="default text">Select Category</div>
+            <div data-attr="category-dropdown" class="menu">
+              <div data-value="culture" class="item">Culture</div>
+              <div data-value="food"class="item">Food</div>
+              <div data-value="nature"class="item">Nature</div>
+              <div data-value="nightlife"class="item">Nightlife</div>
+              <div data-value="misc"class="item" style="font-style:italic">Miscellaneous</div>
+            </div>
+          </div>
+        </div>
+      <div class="field" >
+        <textarea name="tip" placeholder="What's your tip?"></textarea>
+      </div>
+      <div data-action="submit-tip" class="ui button">
+        Add Tip
+      </div>
+    </div>
+  </div>
+</script>
 
 <!-- City Dropdown Template -->
 <script type="text/template" data-id="city-dropdown-template">
@@ -33,24 +69,30 @@
               <div class="item" data-value="<%%= city.id %>"><%%= city.city %>, <%%= city.country %></div>
             <%% }); %>
           </div>
-      </div>  
+    </div>  
   </div>
 </script>
 
 <!-- Tip Results List Item Template -->
 <script type="text/template" data-id="tip-result-template">
   <div class="ten wide column">
-    <div class="ui items">
-      <div class="item">
-        <a class="ui tiny image">
-          <img src="<%%= user.picture %>">
-        </a>
-        <div class="content">
-          <div class="description">
-            <p><%%= tip.content %></p>
+    <div class="ui very relaxed celled list">
+      <%% _.each(allTips, function(tip) { %>
+        <div class="tip item"> 
+          <div style="float:left; text-align:center; margin-right:20px">
+          <img class="ui avatar image" src="<%%= tip.user.picture %>">
+          <p style="font-size:10px"><%%= tip.user.name %></p>
+          </div>
+          <div style="vertical-align:center" class="middle aligned content" style="width: 90%">
+            <div class="description">
+              <p><%%= tip.content %></p>
+            </div>
+          </div>
+          <div style="float:right; vertical-align:center" class="extra">
+              <i class="favorite icon"></i>
           </div>
         </div>
-      </div>
+      <%% }); %> 
     </div>
   </div>
 </script>
