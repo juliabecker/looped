@@ -1,11 +1,9 @@
 Rails.application.routes.draw do
 
-  # root 'welcome#index'
-
-  root 'sessions#new'
+  root 'welcome#index'
 
   get 'home' => 'welcome#index'
-  # get '/login' => 'sessions#new'
+  get '/login' => 'sessions#new'
   get '/logout' => 'sessions#destroy'
   get '/oauth_callback' => 'sessions#create'
 

@@ -1,5 +1,10 @@
 class WelcomeController < ApplicationController
   def index
-    render :index
+    if logged_in?
+      @user = current_user
+      render :index
+    else
+      redirect_to login_path
+    end
   end
 end

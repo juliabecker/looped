@@ -30,14 +30,10 @@ gem 'backbone-rails'
 # Underscore
 gem 'underscore-rails'
 
-# Semantic UI (with dependencies)
-gem 'therubyracer', '~> 0.12.2'
-gem 'less-rails'
-gem 'autoprefixer-rails'
-gem 'semantic-ui-rails'
-
 # HTTParty for API calls
 gem 'httparty', '~> 0.13.5'
+
+gem "font-awesome-rails"
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
