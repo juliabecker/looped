@@ -20,24 +20,37 @@ $(function() {
 
   var Category = Backbone.Model.extend({
     urlRoot: 'api/categories'
-  })
+  });
 
-  var CategoryCollection = Backbone.Model.extend({
+  var Favorite = Backbone.Model.extend({
+    urlRoot: function() {
+      return 'api/users/' + this.get('user_id') + '/favorites'
+    }
+  });
+
+  var FavoriteCollection = Backbone.Collection.extend({
+    url: function() {
+      return 'api/users/' + this.get('user_id') + '/favorites'
+    },
+    model: Favorite
+  });
+
+  var CategoryCollection = Backbone.Collection.extend({
     url: 'api/categories',
     model: Category
-  })
+  });
 
-  var CityCollection = Backbone.Model.extend({
+  var CityCollection = Backbone.Collection.extend({
     url: 'api/cities',
     model: City
   });
 
-  var TipCollection = Backbone.Model.extend({
+  var TipCollection = Backbone.Collection.extend({
     initialize: function(options) {
       this.city_id = options.city_id;
     },
     url: function() {
-      return 'api/cities/' + this.get('city_id') + '/tips/'
+      return 'api/cities/' + this.city_id + '/tips'
     },
     model: Tip
   });
@@ -45,6 +58,7 @@ $(function() {
   var CityResultsView = Backbone.View.extend({
     initialize: function(options) {
       this.collection = options.collection
+      this.currentUser = options.currentUser
       this.render();
     },
     attributes: {
@@ -52,15 +66,22 @@ $(function() {
       id: 'city-results-row'
     },
     template: _.template($('script[data-id="tip-result-template"]').text()),
+    events: {
+      'click .ui.rating': 'addTipToFavorites'
+    },
+    addTipToFavorites: function(event) {
+      var tipID = $(event.target).parent().parent().parent().attr('data-id')
+      var newFavorite = {tip_id: tipID, user_id: this.currentUser.get('id')}
+      var favorite = new Favorite(newFavorite);
+      favorite.save();
+    },
     render: function() {
       // Remove any existing results
       $('#city-results-row').remove()
-      // Reformat tips for rendering in template 
       allTips = [];
-      Object.keys(this.collection.attributes).forEach(function(key){
-          allTips.push(this.collection.attributes[key]);
-        }.bind(this))
-      allTips.pop();
+      this.collection.each(function(tip) {
+        allTips.push(tip.attributes)
+      });
       this.$el.html(this.template(allTips));
       $('#main').append(this.$el);
       // Initialize favorite icon
@@ -71,7 +92,7 @@ $(function() {
   var CityDropdownView = Backbone.View.extend({
     initialize: function(options) {
       this.collection = options.collection;
-      cities = this.collection.attributes;
+      this.currentUser = options.currentUser;
       this.$el.attr('class', 'row');
       this.render();
     },
@@ -85,13 +106,18 @@ $(function() {
       tipCollection.fetch({
         success: function(tips) {
           var cityResultsView = new CityResultsView({
-            collection: tips
+            collection: tips,
+            currentUser: this.currentUser
           })
-        }
+        }.bind(this)
       })
     },
     render: function() {
-      this.$el.html(this.template(cities));
+      var cities = [];
+      this.collection.each(function(city) {
+        cities.push(city.attributes)
+      });
+      this.$el.html(this.template({cities: cities}));
       $('#main').append(this.$el)
       $('.ui.dropdown').dropdown();
     }
@@ -110,12 +136,12 @@ $(function() {
   var AddTipView = Backbone.View.extend({
     initialize: function(options) {
       this.collection = options.collection;
-      cities = this.collection.attributes;
+      // cities = this.collection.attributes;
       this.currentUser = options.currentUser;
-      categories = new CategoryCollection();
+      var categories = new CategoryCollection();
       categories.fetch({
         success: function(categories) {
-          this.categories = categories.attributes;
+          this.categories = categories;
           this.render();
         }.bind(this)
       });
@@ -175,7 +201,15 @@ $(function() {
       }
     },
     render: function() {
-      this.$el.html(this.template({cities: cities, categories: this.categories}));
+      cities = [];
+      this.collection.each(function(city) {
+        cities.push(city.attributes)
+      });
+      categoriesArray = [];
+      this.categories.each(function(category) {
+        categoriesArray.push(category.attributes);
+      })
+      this.$el.html(this.template({cities: cities, categories: categoriesArray}));
       $('#main').append(this.$el)
       $('.ui.dropdown').dropdown();
     }
@@ -196,9 +230,10 @@ $(function() {
       cities.fetch({
         success: function() {
           var cityDropdown = new CityDropdownView({
-              collection: cities
+              collection: cities,
+              currentUser: this.currentUser
            })
-        }
+        }.bind(this)
       })
     },
     addATipView: function() {

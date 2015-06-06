@@ -85,7 +85,7 @@
   <div class="ten wide column">
     <div class="ui very relaxed celled list">
       <%% _.each(allTips, function(tip) { %>
-        <div class="tip item"> 
+        <div class="tip item" data-id="<%%= tip.id %>"> 
           <div style="float:left; text-align:center; margin-right:20px">
           <img class="ui avatar image" src="<%%= tip.user.picture %>">
           <p style="font-size:10px;margin-top:5px"><%%= tip.user.name %></p>
