@@ -10,6 +10,11 @@ module Api
       city = City.find(params[:id])
       render json: city
     end
+
+    def create
+      city = City.create({city: params[:city], country: params[:country]})
+      render json: city
+    end
     
   end
 end

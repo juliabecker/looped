@@ -53,14 +53,18 @@ $(function() {
     },
     template: _.template($('script[data-id="tip-result-template"]').text()),
     render: function() {
-      $('#city-results-row').remove() // Remove any existing results
+      // Remove any existing results
+      $('#city-results-row').remove()
+      // Reformat tips for rendering in template 
       allTips = [];
       Object.keys(this.collection.attributes).forEach(function(key){
           allTips.push(this.collection.attributes[key]);
         }.bind(this))
       allTips.pop();
       this.$el.html(this.template(allTips));
-      $('#main').append(this.$el)
+      $('#main').append(this.$el);
+      // Initialize favorite icon
+      $('.ui.rating').rating(); 
     }
   });
 
@@ -108,26 +112,70 @@ $(function() {
       this.collection = options.collection;
       cities = this.collection.attributes;
       this.currentUser = options.currentUser;
-      this.render();
+      categories = new CategoryCollection();
+      categories.fetch({
+        success: function(categories) {
+          this.categories = categories.attributes;
+          this.render();
+        }.bind(this)
+      });
     },
     attributes: {
       class: 'row'
     },
     events: {
-      'click [data-action="submit-tip"]': 'addTip'
+      'click [data-action="submit-tip"]': 'addTip',
+      'change [name="city-dropdown"]': 'checkIfNewCity'
     },
     template: _.template($('script[data-id="add-tip=template"]').text()),
     addTip: function(event) {
       var cityID = $('div[name="city-dropdown"]').dropdown('get value');
-      var category = $('div[name="category-dropdown"]').dropdown('get value');
-      var tipContent = $('textarea[name="tip"]').val();
-      var tip = {
-
+      // Add new city to database if new 
+      if (cityID === "add-new") {
+        var newCityName = $('input[data-id="new-city-field"]').val();
+        var newCountryName = $('input[data-id="new-country-field"]').val();
+        var newCityData = {city: newCityName, country: newCountryName};
+        var newCity = new City(newCity);
+        newCity.save(newCityData, {
+          success: function(city) {
+            cityID = city.get('id')
+            this.saveTip(cityID)
+          }.bind(this)
+        })
+      } else {
+        this.saveTip(cityID)
       }
-      var tip = new Tip({})
+      
+    },
+    saveTip: function(cityID) {
+      var categoryID = $('div[name="category-dropdown"]').dropdown('get value');
+      var tipContent = $('textarea[name="tip"]').val();
+      var newTip = {
+        city_id: cityID,
+        category_id: categoryID,
+        content: tipContent,
+        user_id: this.currentUser.id
+      }
+      var tip = new Tip(newTip)
+      tip.save();
+      myRouter.navigate('', {trigger:true})
+    },
+    // Display "Add New City" field if "Add New City" selected in dropdown
+    checkIfNewCity: function() {
+      var newCityField = $('div[data-id="add-new-city-field"]');
+      var newCountryField = $('div[data-id="add-new-country-field"]');
+      var citySelected = $('div[name="city-dropdown"]').dropdown('get value');
+
+      if (citySelected === "add-new") {
+        newCityField.removeClass("hidden-field");
+        newCountryField.removeClass("hidden-field");
+      } else {
+        newCityField.addClass("hidden-field");
+        newCountryField.addClass("hidden-field");
+      }
     },
     render: function() {
-      this.$el.html(this.template(cities));
+      this.$el.html(this.template({cities: cities, categories: this.categories}));
       $('#main').append(this.$el)
       $('.ui.dropdown').dropdown();
     }
@@ -136,7 +184,6 @@ $(function() {
   var Router = Backbone.Router.extend({
     initialize: function(currentUser) {
       this.currentUser = currentUser;
-      console.log(currentUser)
       var menuView = new MenuView();
     },
     routes: {
@@ -144,6 +191,7 @@ $(function() {
       'add': 'addATipView'
     },
     index: function() {
+      $('#main').empty();
       var cities = new CityCollection();
       cities.fetch({
         success: function() {

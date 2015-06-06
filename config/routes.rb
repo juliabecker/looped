@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   get '/oauth_callback' => 'sessions#create'
 
   namespace :api do
-    resources :categories, only [:index]
+    resources :categories, only: [:show, :index]
     resources :cities, except: [:destroy, :update] do
       resources :tips, except: [:destroy, :update]
     end
