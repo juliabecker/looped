@@ -21,5 +21,4 @@
 //= require backbone-rails
 //= require underscore
 
-
 //= require_tree .

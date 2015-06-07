@@ -28,6 +28,8 @@ $(function() {
     }
   });
 
+  // ------------------ COLLECTIONS ------------------
+
   var FavoriteCollection = Backbone.Collection.extend({
     url: function() {
       return 'api/users/' + this.get('user_id') + '/favorites'
@@ -55,69 +57,83 @@ $(function() {
     model: Tip
   });
 
-  var CityResultsView = Backbone.View.extend({
-    initialize: function(options) {
-      this.collection = options.collection
-      this.currentUser = options.currentUser
-      this.render();
+  // ------------------ VIEWS ------------------
+
+  var TipView = Backbone.View.extend({
+    initialize: function() {
+      this.listenTo(this.model, 'change', this.render)
     },
-    attributes: {
-      class: 'row',
-      id: 'city-results-row'
-    },
+    className: 'tip item',
     template: _.template($('script[data-id="tip-result-template"]').text()),
     events: {
       'click .ui.rating': 'addTipToFavorites'
     },
     addTipToFavorites: function(event) {
       var tipID = $(event.target).parent().parent().parent().attr('data-id')
-      var newFavorite = {tip_id: tipID, user_id: this.currentUser.get('id')}
+      var newFavorite = {tip_id: tipID, user_id: currentUser.get('id')}
       var favorite = new Favorite(newFavorite);
-      favorite.save();
     },
     render: function() {
-      // Remove any existing results
-      $('#city-results-row').remove()
-      allTips = [];
-      this.collection.each(function(tip) {
-        allTips.push(tip.attributes)
-      });
-      this.$el.html(this.template(allTips));
-      $('#main').append(this.$el);
-      // Initialize favorite icon
-      $('.ui.rating').rating(); 
+      this.$el.html(this.template(this.model.attributes))
+
     }
   });
 
-  var CityDropdownView = Backbone.View.extend({
+  var CityResultsView = Backbone.View.extend({
     initialize: function(options) {
-      this.collection = options.collection;
-      this.currentUser = options.currentUser;
-      this.$el.attr('class', 'row');
+      this.listenTo(this.collection, 'add', this.addOne)
+      this.collection.fetch();
+    },
+    attributes: {
+      id: 'city-results-row'
+    },
+    className: 'row',
+    el: 'div[data-id="results-container"]',
+    template: _.template($('script[data-id="tip-result-template"]').text()),
+    addOne: function(tipModel) {
+      var newTipView = new TipView({model: tipModel});
+      newTipView.render();
+      this.$el.append(newTipView.$el)
+      $('.ui.rating').rating();
+    },
+
+    // render: function() {
+    //   console.log(tips.models)
+    //   // Remove any existing results
+    //   $('#city-results-row').remove()
+    //   tipsArray = [];
+    //   tips.each(function(tip) {
+    //     console.log(tip.attributes)
+    //     tipsArray.push(tip.attributes)
+    //   });
+    //   this.$el.html(this.template({tips: tipsArray}));
+    //   $('#main').append(this.$el);
+    //   // Initialize favorite icon
+    //   $('.ui.rating').rating(); 
+    // }
+  });
+
+  var CityDropdownView = Backbone.View.extend({
+    initialize: function() {
       this.render();
     },
+    className: 'row',
     template: _.template($('script[data-id="city-dropdown-template"]').text()),
     events: {
       'change': 'showCityResults'
     },
     showCityResults: function() {
+      $('div[data-id="results-container"]').empty()
       var cityID = $('.ui.dropdown').dropdown('get value');
-      var tipCollection = new TipCollection({city_id: cityID})
-      tipCollection.fetch({
-        success: function(tips) {
-          var cityResultsView = new CityResultsView({
-            collection: tips,
-            currentUser: this.currentUser
-          })
-        }.bind(this)
-      })
+      tips = new TipCollection({city_id: cityID});
+      var cityResultsView = new CityResultsView({collection: tips});
     },
     render: function() {
-      var cities = [];
-      this.collection.each(function(city) {
-        cities.push(city.attributes)
+      var citiesArray = [];
+      cities.each(function(city) {
+        citiesArray.push(city.attributes)
       });
-      this.$el.html(this.template({cities: cities}));
+      this.$el.html(this.template({cities: citiesArray}));
       $('#main').append(this.$el)
       $('.ui.dropdown').dropdown();
     }
@@ -129,22 +145,16 @@ $(function() {
     events: {
       'click [data-id="add-tip-button"]': function() {
         myRouter.navigate('add', {trigger:true})
+      },
+      'click #menu-image': function() {
+        myRouter.navigate('user/' + currentUser.get('id'), {trigger:true})
       }
     }
   });
 
   var AddTipView = Backbone.View.extend({
-    initialize: function(options) {
-      this.collection = options.collection;
-      // cities = this.collection.attributes;
-      this.currentUser = options.currentUser;
-      var categories = new CategoryCollection();
-      categories.fetch({
-        success: function(categories) {
-          this.categories = categories;
-          this.render();
-        }.bind(this)
-      });
+    initialize: function() {
+      this.render();
     },
     attributes: {
       class: 'row'
@@ -180,7 +190,7 @@ $(function() {
         city_id: cityID,
         category_id: categoryID,
         content: tipContent,
-        user_id: this.currentUser.id
+        user_id: currentUser.get('id')
       }
       var tip = new Tip(newTip)
       tip.save();
@@ -201,67 +211,77 @@ $(function() {
       }
     },
     render: function() {
-      cities = [];
-      this.collection.each(function(city) {
-        cities.push(city.attributes)
+      citiesArray = [];
+      cities.each(function(city) {
+        citiesArray.push(city.attributes)
       });
       categoriesArray = [];
-      this.categories.each(function(category) {
+      categories.each(function(category) {
         categoriesArray.push(category.attributes);
       })
-      this.$el.html(this.template({cities: cities, categories: categoriesArray}));
+      this.$el.html(this.template({cities: citiesArray, categories: categoriesArray}));
       $('#main').append(this.$el)
       $('.ui.dropdown').dropdown();
     }
   });
 
+  var UserProfileView = Backbone.View.extend({
+    initialize: function() {
+      console.log(currentUser)
+    }
+  });
+
+  // ------------------ ROUTER ------------------
+
   var Router = Backbone.Router.extend({
-    initialize: function(currentUser) {
-      this.currentUser = currentUser;
+    initialize: function() {
       var menuView = new MenuView();
+      cities = new CityCollection();
+      categories = new CategoryCollection();
+      cities.fetch();
+      categories.fetch();
     },
     routes: {
       '': 'index',
-      'add': 'addATipView'
+      'add': 'addATipView',
+      'users/:id': 'userProfileView'
     },
     index: function() {
       $('#main').empty();
-      var cities = new CityCollection();
-      cities.fetch({
-        success: function() {
-          var cityDropdown = new CityDropdownView({
-              collection: cities,
-              currentUser: this.currentUser
-           })
-        }.bind(this)
-      })
+      var cityDropdown = new CityDropdownView();
     },
     addATipView: function() {
       $('#main').empty();
-      var cities = new CityCollection();
-      cities.fetch({
-        success: function() {
-          var addTipView = new AddTipView({
-            collection: cities,
-            currentUser: this.currentUser
-          })
-        }.bind(this)
-      })
+      var addTipView = new AddTipView()
+    },
+    userProfileView: function(user_id) {
+      $('#main').empty();
+      var userProfileView = new UserProfileView();
     }
   });
 
   // Accounts for Facebook redirect URL with trailing #_=_
   if (window.location.hash && window.location.hash == '#_=_') {
         window.location.hash = '';
-    }
+  }
 
-  // Get user info on initial page load
+  var currentUser;
+  var cities;
+  var categories;
+  var tips;
+
+  var myRouter = new Router();
+
   $.getJSON('/sessions').done(function(user) {
-    window.myRouter = new Router(new User(user));
+    currentUser = new User(user);
     Backbone.history.start();
   });
 
-  
+  // Get user info on initial page load
+  // $.getJSON('/sessions').done(function(user) {
+  //   window.myRouter = new Router(new User(user));
+  //   Backbone.history.start();
+  // });
 
   
 });
