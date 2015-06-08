@@ -295,6 +295,7 @@ $(function() {
       'users/:id': 'userProfileView'
     },
     index: function() {
+      console.log('index route hit')
       $('#main').empty();
       var cityDropdown = new CityDropdownView({collection: cities});
     },
@@ -314,7 +315,6 @@ $(function() {
   var currentUser;
   var tips;
   var favorites;
-
   // Bootstrapped Models
   var cities = new CityCollection(allCities);
   var categories = new CategoryCollection(allCategories)
