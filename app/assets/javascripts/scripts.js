@@ -14,17 +14,24 @@ $(function() {
 
   var Tip = Backbone.Model.extend({
     initialize: function(options) {
-      if (options.city_id) {
-        this.urlRoot = function() { return '/api/cities' + options.city_id + '/tips' }
+
+      if (favorites.findWhere({tip_id: this.get('id')})) {
+        this.set('favorited', true)
       } else {
-        this.urlRoot = function() { return '/api/cities' + currentUser.id + '/tips' }
+        this.set('favorited', false)
+      }
+
+      this.type = options.type
+      if (this.type == "city") {
+        this.urlRoot = function() { return '/api/cities' + options.city_id + '/tips' }
+      } else if (this.type == "favorites") {
+        this.urlRoot = 'api/favorite-tips'
+      } 
+      else if (this.type == "contributed") {
+        this.urlRoot = function() { return '/api/users' + currentUser.id + '/tips' }
       }
     }
   });
-
-  var FavoriteTip = Backbone.Model.extend({
-    urlRoot: 'api/favorite-tips'
-  })
 
   var Category = Backbone.Model.extend({
     urlRoot: 'api/categories'
@@ -66,9 +73,12 @@ $(function() {
 
   var TipCollection = Backbone.Collection.extend({
     initialize: function(options) {
-      if (options) {
+      this.type = options.type
+      if (this.type == "city") {
         this.city_id = options.city_id;
         this.url = function() { return 'api/cities/' + this.city_id + '/tips' }
+      } else if (this.type == "favorites") {
+        this.url = 'api/favorite-tips'
       } else {
         this.url = function() { return 'api/users/' + currentUser.id + '/tips' }
       }
@@ -76,10 +86,6 @@ $(function() {
     model: Tip
   });
 
-  var FavoriteTipCollection = Backbone.Collection.extend({
-    url: 'api/favorite-tips',
-    model: FavoriteTip
-  })
 
   // ------------------ VIEWS ------------------
 
@@ -97,7 +103,6 @@ $(function() {
 
   var TipView = Backbone.View.extend({
     initialize: function() {
-      console.log('tip view initialize hit')
       this.listenTo(this.model, 'change', this.render)
     },
     className: 'tip item',
@@ -118,8 +123,9 @@ $(function() {
 
   var CityResultsView = Backbone.View.extend({
     initialize: function(options) {
+      this.view = options.view
       this.listenTo(this.collection, 'add', this.addOne)
-      if (options.data) {
+      if (options.view === "user-favorites") {
         this.collection.fetch({data: options.data});
       } else {
         this.collection.fetch();
@@ -132,11 +138,20 @@ $(function() {
     el: 'div[data-id="results-container"]',
     template: _.template($('script[data-id="tip-result-template"]').text()),
     addOne: function(tipModel) {
-      console.log('add one hit')
+      console.log(tipModel.get('favorited'))
       var newTipView = new TipView({model: tipModel});
       newTipView.render();
       this.$el.append(newTipView.$el)
-      $('.ui.rating').rating(); // Initialize favorite icon
+      // Favorite icon enabled on home view
+      if (this.view === "home") {
+        $('.ui.rating').rating(); 
+      // Favorite icon disabled on user profile favorites view
+      } else if ((this.view === "user-favorites") || (tipModel.get('favorited') === true)){
+        $('.ui.rating').rating({initialRating: 1}); 
+        $('.ui.rating').rating('disable');
+      } else if (tipModel.get('favorited') === false) {
+        console.log('true hit')
+      }
     }
   });
 
@@ -156,8 +171,8 @@ $(function() {
     showCityResults: function() {
       $('div[data-id="results-container"]').empty()
       var cityID = $('.ui.dropdown').dropdown('get value');
-      tips = new TipCollection({city_id: cityID});
-      var cityResultsView = new CityResultsView({collection: tips});
+      tips = new TipCollection({city_id: cityID, type: "city"});
+      var cityResultsView = new CityResultsView({collection: tips, view: "home"});
     },
     render: function() {
       var citiesArray = [];
@@ -260,15 +275,15 @@ $(function() {
       $('div[data-id="results-container"]').empty();
       var favoriteTipsArray = favorites.pluck('tip');
       var favoriteTipIDs = _.pluck(favoriteTipsArray, 'id')
-      var favoriteTips = new FavoriteTipCollection();
-      var cityResultsView = new CityResultsView({collection: favoriteTips, data: {tip_id_array: favoriteTipIDs}})
+      var favoriteTips = new TipCollection({type: "favorites"});
+      var cityResultsView = new CityResultsView({collection: favoriteTips, data: {tip_id_array: favoriteTipIDs}, view: "user-favorites"})
     },
     showContributed: function() {
       $('a[data-id="contributed-tab"]').addClass('active');
       $('a[data-id="favorites-tab"]').removeClass('active');
       $('div[data-id="results-container"]').empty();
-      var contributedTips = new TipCollection();
-      var cityResultsView = new CityResultsView({collection: contributedTips})
+      var contributedTips = new TipCollection({type: "contributed"});
+      var cityResultsView = new CityResultsView({collection: contributedTips, view: "user-contributed"})
     },
     render: function() {
       this.$el.html(this.template(currentUser.attributes));
@@ -315,6 +330,8 @@ $(function() {
   var currentUser;
   var tips;
   var favorites;
+  var view;
+  var type;
   // Bootstrapped Models
   var cities = new CityCollection(allCities);
   var categories = new CategoryCollection(allCategories)
