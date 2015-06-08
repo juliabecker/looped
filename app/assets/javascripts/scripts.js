@@ -144,7 +144,8 @@ $(function() {
       this.$el.append(newTipView.$el)
       // Favorite icon enabled on home view
       if (this.view === "home") {
-        $('#city-title').css('display', 'none');
+        $('p[data-id="city-title"]').css('display', 'none');
+        // Disable if favorited
         if(tipModel.get('favorited') === true) {
           var tipID = tipModel.get('id');
           $('.ui.rating').rating({initialRating: 1}); 
@@ -265,6 +266,7 @@ $(function() {
 
   var UserProfileView = Backbone.View.extend({
     initialize: function() {
+      this.listenTo(favorites, 'add', this.showFavorites)
       this.render();
     },
     template: _.template($('script[data-id="user-profile"]').text()),
