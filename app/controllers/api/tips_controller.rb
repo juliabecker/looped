@@ -17,8 +17,7 @@ module Api
     end
 
     def favorites
-      int_id_array = params[:tip_id_array].map(&:to_i)
-      tips = Tip.find(int_id_array)  
+      tips = Tip.joins(:favorites).where(favorites: {user_id: session[:user_id]})
       render json: tips, :include => [:user, :category, :city]
     end
 

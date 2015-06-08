@@ -1,11 +1,11 @@
 #logo {
   margin-top: 30px;
-  width: 250px;
+  width: 300px;
 }
 
 #menu-image {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 
 .ui.tiny.image {
@@ -25,12 +25,20 @@
 }
 
 #tip-user-name {
-  font-size:11px;
+  font-size:12px;
   margin-top:10px;
 }
 
+.ui.list {
+  font-size: 1.1em;
+}
+
+.ui.menu .item {
+  font-size: 1.2rem;
+}
+
 [data-id="city-title"] {
-  font-size:9px;
+  font-size:10px;
   text-transform: uppercase;
   font-weight: bold;
 }
