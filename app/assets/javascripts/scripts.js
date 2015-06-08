@@ -22,12 +22,6 @@ $(function() {
     }
   });
 
-  var UserTip = Backbone.Model.extend({
-    urlRoot: function() {
-      return 'api/users/' + currentUser.get('id') + '/tips'
-    }
-  })
-
   var FavoriteTip = Backbone.Model.extend({
     urlRoot: 'api/favorite-tips'
   })
@@ -124,7 +118,6 @@ $(function() {
 
   var CityResultsView = Backbone.View.extend({
     initialize: function(options) {
-      console.log("city results initialize hit")
       this.listenTo(this.collection, 'add', this.addOne)
       if (options.data) {
         this.collection.fetch({data: options.data});
@@ -289,11 +282,11 @@ $(function() {
   var Router = Backbone.Router.extend({
     initialize: function() {
       var menuView = new MenuView();
-      cities = new CityCollection();
-      categories = new CategoryCollection();
+      // cities = new CityCollection();
+      // categories = new CategoryCollection();
       favorites = new FavoriteCollection({user_id: currentUser.get('id')});
-      cities.fetch();
-      categories.fetch();
+      // cities.fetch();
+      // categories.fetch();
       favorites.fetch();
     },
     routes: {
@@ -319,10 +312,12 @@ $(function() {
   // Global variables
   var router;
   var currentUser;
-  var cities;
-  var categories;
   var tips;
   var favorites;
+
+  // Bootstrapped Models
+  var cities = new CityCollection(allCities);
+  var categories = new CategoryCollection(allCategories)
 
   // Get current user on page load
   $.getJSON('/sessions').done(function(user) {
