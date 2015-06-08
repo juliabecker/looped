@@ -7,7 +7,7 @@ module Api
       else
         tips = Tip.where({user_id: params[:user_id]})
       end
-      render json: tips, :include => [:user, :category]
+      render json: tips, :include => [:user, :category, :city]
     end
     
     def create
@@ -17,10 +17,9 @@ module Api
     end
 
     def favorites
-      puts params
       int_id_array = params[:tip_id_array].map(&:to_i)
       tips = Tip.find(int_id_array)  
-      render json: tips, :include => [:user,:category]
+      render json: tips, :include => [:user, :category, :city]
     end
 
   end

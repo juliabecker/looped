@@ -17,6 +17,36 @@
   display:none;
 }
 
+#tip-avatar {
+  float:left;
+  text-align:center;
+  margin-right:20px;
+  width: 70px;
+}
+
+#tip-user-name {
+  font-size:11px;
+  margin-top:10px;
+}
+
+#city-title {
+  font-size:9px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+#category-title {
+  text-transform: none;
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.extra.rating-content {
+  float:right;
+  vertical-align:center;
+}
+
+
 /*body {
   color: #636;
   background-color: #fefdf3;
