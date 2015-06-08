@@ -138,21 +138,24 @@ $(function() {
     el: 'div[data-id="results-container"]',
     template: _.template($('script[data-id="tip-result-template"]').text()),
     addOne: function(tipModel) {
-      console.log(tipModel.get('favorited'))
       var newTipView = new TipView({model: tipModel});
       newTipView.render();
       this.$el.append(newTipView.$el)
       // Favorite icon enabled on home view
       if (this.view === "home") {
-        $('.ui.rating').rating(); 
+        if(tipModel.get('favorited') === true) {
+          var tipID = tipModel.get('id');
+          $('.ui.rating').rating({initialRating: 1}); 
+          $('.ui.rating').rating('disable');
+        } else {
+          $('.ui.rating').rating();
+        }
       // Favorite icon disabled on user profile favorites view
-      } else if ((this.view === "user-favorites") || (tipModel.get('favorited') === true)){
+      } else if (this.view === "user-favorites"){
         $('.ui.rating').rating({initialRating: 1}); 
         $('.ui.rating').rating('disable');
-      } else if (tipModel.get('favorited') === false) {
-        console.log('true hit')
-      }
     }
+  }
   });
 
   var CityDropdownView = Backbone.View.extend({
@@ -297,11 +300,7 @@ $(function() {
   var Router = Backbone.Router.extend({
     initialize: function() {
       var menuView = new MenuView();
-      // cities = new CityCollection();
-      // categories = new CategoryCollection();
       favorites = new FavoriteCollection({user_id: currentUser.get('id')});
-      // cities.fetch();
-      // categories.fetch();
       favorites.fetch();
     },
     routes: {
@@ -310,7 +309,6 @@ $(function() {
       'users/:id': 'userProfileView'
     },
     index: function() {
-      console.log('index route hit')
       $('#main').empty();
       var cityDropdown = new CityDropdownView({collection: cities});
     },

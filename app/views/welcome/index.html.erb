@@ -18,8 +18,8 @@
 
 <!-- Bootstrap cities & categories collections -->
 <script>
-var allCategories = <%=j @categories.to_json.html_safe %>
-var allCities = <%=j @cities.to_json.html_safe %>
+  var allCategories = <%=j @categories.to_json.html_safe %>
+  var allCities = <%=j @cities.to_json.html_safe %>
   // var categories = new Backbone.Collection;
   // categories.reset(<%=j @categories.to_json.html_safe %>);
   // var cities = new Backbone.Collection;
@@ -96,17 +96,18 @@ var allCities = <%=j @cities.to_json.html_safe %>
   
 <!-- Tip Results List Item Template -->
 <script type="text/template" data-id="tip-result-template">
-  <div style="float:left; text-align:center; margin-right:20px">
+  <div style="float:left; text-align:center; margin-right:20px; width: 70px">
     <img class="ui avatar image" src="<%%= user.picture %>">
-    <p style="font-size:10px;margin-top:5px"><%%= user.name %></p>
+    <p style="font-size:11px;margin-top:10px"><%%= user.name %></p>
   </div>
-  <div style="vertical-align:center" class="middle aligned content" style="width: 90%">
+  <div style="vertical-align:center" class="middle aligned content" style="width: 80%">
     <div class="description">
+      <p style="font-size:9px;"><%%= category.title %></p>
       <p><%%= content %></p>
     </div>
   </div>
   <div style="float:right; vertical-align:center" class="extra">
-    <div class="ui rating" data-max-rating="1" data-id="<%%= id %>"></div>
+    <div id="<%%= id %>-rating" class="ui rating" data-max-rating="1" data-id="<%%= id %>"></div>
   </div>
 </script>
 
