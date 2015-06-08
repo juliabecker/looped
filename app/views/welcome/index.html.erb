@@ -16,6 +16,14 @@
 </header>
 <main id="main" class="ui centered page grid">
 
+<!-- Bootstrap cities & categories collections -->
+<script>
+  var categories = new Backbone.Collection;
+  categories.reset(<%=j @categories.to_json.html_safe %>);
+  var cities = new Backbone.Collection;
+  cities.reset(<%=j @cities.to_json.html_safe %>);
+</script>
+
 <!-- Add Tip Form -->
 <script type="text/template" data-id="add-tip=template">
   <div class="ten wide column">
@@ -84,7 +92,6 @@
 </script>
 
   
-
 <!-- Tip Results List Item Template -->
 <script type="text/template" data-id="tip-result-template">
   <div style="float:left; text-align:center; margin-right:20px">
@@ -99,5 +106,22 @@
   <div style="float:right; vertical-align:center" class="extra">
     <div class="ui rating" data-max-rating="1" data-id="<%%= id %>"></div>
   </div>
+</script>
 
+<!-- User Profile Template - Tabs -->
+<script type="text/template" data-id="user-profile">
+  <h2><%%= name %></h4>
+  <div class="ten wide column">
+  <div class="ui top attached tabular menu">
+    <a class="item" data-id="favorites-tab">Favorites</a>
+    <a class="item" data-id="contributed-tab">Contributed</a>
+  </div>
+  <div class="ui bottom attached tab segment">
+    <p></p>
+    <p></p>
+  </div>
+  </div>
+  <div class="ten wide column">
+    <div data-id="results-container" style="text-align:left" class="ui very relaxed celled list"></div>
+  </div>
 </script>

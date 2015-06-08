@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get '/logout' => 'sessions#destroy'
   get '/oauth_callback' => 'sessions#create'
 
+
   namespace :api do
     resources :categories, only: [:show, :index]
     resources :cities, except: [:destroy, :update] do
@@ -14,7 +15,9 @@ Rails.application.routes.draw do
     end
     resources :users, except: [:destroy] do
       resources :favorites, except: [:destroy, :update]
+      resources :tips, only: [:index, :show]
     end
+    get '/favorite-tips' => 'tips#favorites'
   end
 
   resource :sessions, except: [:update]

@@ -13,10 +13,24 @@ $(function() {
   });
 
   var Tip = Backbone.Model.extend({
-    urlRoot: function() {
-      return 'api/cities/' + this.get('city_id') + '/tips'
+    initialize: function(options) {
+      if (options.city_id) {
+        this.urlRoot = function() { return '/api/cities' + options.city_id + '/tips' }
+      } else {
+        this.urlRoot = function() { return '/api/cities' + currentUser.id + '/tips' }
+      }
     }
   });
+
+  var UserTip = Backbone.Model.extend({
+    urlRoot: function() {
+      return 'api/users/' + currentUser.get('id') + '/tips'
+    }
+  })
+
+  var FavoriteTip = Backbone.Model.extend({
+    urlRoot: 'api/favorite-tips'
+  })
 
   var Category = Backbone.Model.extend({
     urlRoot: 'api/categories'
@@ -31,8 +45,11 @@ $(function() {
   // ------------------ COLLECTIONS ------------------
 
   var FavoriteCollection = Backbone.Collection.extend({
+    initialize: function(options) {
+      this.user_id = options.user_id;
+    },
     url: function() {
-      return 'api/users/' + this.get('user_id') + '/favorites'
+      return 'api/users/' + this.user_id + '/favorites'
     },
     model: Favorite
   });
@@ -43,24 +60,50 @@ $(function() {
   });
 
   var CityCollection = Backbone.Collection.extend({
+    initialize: function() {
+      this.sort();
+    },
     url: 'api/cities',
-    model: City
+    model: City,
+    comparator: function(cityModel) {
+      return cityModel.get('city');
+    }
   });
 
   var TipCollection = Backbone.Collection.extend({
     initialize: function(options) {
-      this.city_id = options.city_id;
-    },
-    url: function() {
-      return 'api/cities/' + this.city_id + '/tips'
+      if (options) {
+        this.city_id = options.city_id;
+        this.url = function() { return 'api/cities/' + this.city_id + '/tips' }
+      } else {
+        this.url = function() { return 'api/users/' + currentUser.id + '/tips' }
+      }
     },
     model: Tip
   });
 
+  var FavoriteTipCollection = Backbone.Collection.extend({
+    url: 'api/favorite-tips',
+    model: FavoriteTip
+  })
+
   // ------------------ VIEWS ------------------
+
+  var MenuView = Backbone.View.extend({
+    el: $('div[data-id="menu"]'),
+    events: {
+      'click [data-id="add-tip-button"]': function() {
+        router.navigate('add', {trigger:true})
+      },
+      'click #menu-image': function() {
+        router.navigate('users/' + currentUser.get('id'), {trigger:true})
+      }
+    }
+  });
 
   var TipView = Backbone.View.extend({
     initialize: function() {
+      console.log('tip view initialize hit')
       this.listenTo(this.model, 'change', this.render)
     },
     className: 'tip item',
@@ -69,20 +112,25 @@ $(function() {
       'click .ui.rating': 'addTipToFavorites'
     },
     addTipToFavorites: function(event) {
-      var tipID = $(event.target).parent().parent().parent().attr('data-id')
+      var tipID = $(event.target).parent().data('id');
       var newFavorite = {tip_id: tipID, user_id: currentUser.get('id')}
       var favorite = new Favorite(newFavorite);
+      favorite.save();
     },
     render: function() {
       this.$el.html(this.template(this.model.attributes))
-
     }
   });
 
   var CityResultsView = Backbone.View.extend({
     initialize: function(options) {
+      console.log("city results initialize hit")
       this.listenTo(this.collection, 'add', this.addOne)
-      this.collection.fetch();
+      if (options.data) {
+        this.collection.fetch({data: options.data});
+      } else {
+        this.collection.fetch();
+      }
     },
     attributes: {
       id: 'city-results-row'
@@ -91,31 +139,21 @@ $(function() {
     el: 'div[data-id="results-container"]',
     template: _.template($('script[data-id="tip-result-template"]').text()),
     addOne: function(tipModel) {
+      console.log('add one hit')
       var newTipView = new TipView({model: tipModel});
       newTipView.render();
       this.$el.append(newTipView.$el)
-      $('.ui.rating').rating();
-    },
-
-    // render: function() {
-    //   console.log(tips.models)
-    //   // Remove any existing results
-    //   $('#city-results-row').remove()
-    //   tipsArray = [];
-    //   tips.each(function(tip) {
-    //     console.log(tip.attributes)
-    //     tipsArray.push(tip.attributes)
-    //   });
-    //   this.$el.html(this.template({tips: tipsArray}));
-    //   $('#main').append(this.$el);
-    //   // Initialize favorite icon
-    //   $('.ui.rating').rating(); 
-    // }
+      $('.ui.rating').rating(); // Initialize favorite icon
+    }
   });
 
   var CityDropdownView = Backbone.View.extend({
     initialize: function() {
-      this.render();
+      this.collection.fetch({
+        success: function() {
+          this.render();
+        }.bind(this)
+      });
     },
     className: 'row',
     template: _.template($('script[data-id="city-dropdown-template"]').text()),
@@ -140,25 +178,11 @@ $(function() {
 
   });
 
-  var MenuView = Backbone.View.extend({
-    el: $('div[data-id="menu"]'),
-    events: {
-      'click [data-id="add-tip-button"]': function() {
-        myRouter.navigate('add', {trigger:true})
-      },
-      'click #menu-image': function() {
-        myRouter.navigate('user/' + currentUser.get('id'), {trigger:true})
-      }
-    }
-  });
-
   var AddTipView = Backbone.View.extend({
     initialize: function() {
       this.render();
     },
-    attributes: {
-      class: 'row'
-    },
+    className: 'row',
     events: {
       'click [data-action="submit-tip"]': 'addTip',
       'change [name="city-dropdown"]': 'checkIfNewCity'
@@ -180,8 +204,7 @@ $(function() {
         })
       } else {
         this.saveTip(cityID)
-      }
-      
+      }    
     },
     saveTip: function(cityID) {
       var categoryID = $('div[name="category-dropdown"]').dropdown('get value');
@@ -194,7 +217,7 @@ $(function() {
       }
       var tip = new Tip(newTip)
       tip.save();
-      myRouter.navigate('', {trigger:true})
+      router.navigate('', {trigger:true})
     },
     // Display "Add New City" field if "Add New City" selected in dropdown
     checkIfNewCity: function() {
@@ -227,9 +250,39 @@ $(function() {
 
   var UserProfileView = Backbone.View.extend({
     initialize: function() {
-      console.log(currentUser)
+      this.render();
+    },
+    template: _.template($('script[data-id="user-profile"]').text()),
+    className: 'ten wide column',
+    attributes: {
+      'style': 'text-align:center'
+    },
+    events: {
+      'click a[data-id="contributed-tab"]': 'showContributed',
+      'click a[data-id="favorites-tab"]': 'showFavorites'
+    },
+    showFavorites: function() {
+      $('a[data-id="favorites-tab"]').addClass('active');
+      $('a[data-id="contributed-tab"]').removeClass('active');
+      $('div[data-id="results-container"]').empty();
+      var favoriteTipsArray = favorites.pluck('tip');
+      var favoriteTipIDs = _.pluck(favoriteTipsArray, 'id')
+      var favoriteTips = new FavoriteTipCollection();
+      var cityResultsView = new CityResultsView({collection: favoriteTips, data: {tip_id_array: favoriteTipIDs}})
+    },
+    showContributed: function() {
+      $('a[data-id="contributed-tab"]').addClass('active');
+      $('a[data-id="favorites-tab"]').removeClass('active');
+      $('div[data-id="results-container"]').empty();
+      var contributedTips = new TipCollection();
+      var cityResultsView = new CityResultsView({collection: contributedTips})
+    },
+    render: function() {
+      this.$el.html(this.template(currentUser.attributes));
+      $('#main').append(this.$el)
     }
   });
+
 
   // ------------------ ROUTER ------------------
 
@@ -238,8 +291,10 @@ $(function() {
       var menuView = new MenuView();
       cities = new CityCollection();
       categories = new CategoryCollection();
+      favorites = new FavoriteCollection({user_id: currentUser.get('id')});
       cities.fetch();
       categories.fetch();
+      favorites.fetch();
     },
     routes: {
       '': 'index',
@@ -248,40 +303,37 @@ $(function() {
     },
     index: function() {
       $('#main').empty();
-      var cityDropdown = new CityDropdownView();
+      var cityDropdown = new CityDropdownView({collection: cities});
     },
     addATipView: function() {
       $('#main').empty();
-      var addTipView = new AddTipView()
+      var addTipView = new AddTipView();
     },
     userProfileView: function(user_id) {
       $('#main').empty();
       var userProfileView = new UserProfileView();
+      userProfileView.showFavorites();
     }
+  });
+
+  // Global variables
+  var router;
+  var currentUser;
+  var cities;
+  var categories;
+  var tips;
+  var favorites;
+
+  // Get current user on page load
+  $.getJSON('/sessions').done(function(user) {
+    currentUser = new User(user);
+    router = new Router();
+    Backbone.history.start();
   });
 
   // Accounts for Facebook redirect URL with trailing #_=_
   if (window.location.hash && window.location.hash == '#_=_') {
         window.location.hash = '';
   }
-
-  var currentUser;
-  var cities;
-  var categories;
-  var tips;
-
-  var myRouter = new Router();
-
-  $.getJSON('/sessions').done(function(user) {
-    currentUser = new User(user);
-    Backbone.history.start();
-  });
-
-  // Get user info on initial page load
-  // $.getJSON('/sessions').done(function(user) {
-  //   window.myRouter = new Router(new User(user));
-  //   Backbone.history.start();
-  // });
-
   
 });
