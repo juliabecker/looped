@@ -25,12 +25,24 @@
 }
 
 #tip-user-name {
-  font-size:12px;
+  font-size:13px;
   margin-top:10px;
 }
 
 .ui.list {
-  font-size: 1.1em;
+  font-size: 1.2em;
+}
+
+.ui.search {
+  font-size: 1.2em;
+}
+
+.ui.form textarea {
+  font-size: 1.2em;
+}
+
+.ui.button {
+  font-size: 1.2rem;
 }
 
 .ui.menu .item {
@@ -38,7 +50,7 @@
 }
 
 [data-id="city-title"] {
-  font-size:10px;
+  font-size:11px;
   text-transform: uppercase;
   font-weight: bold;
 }

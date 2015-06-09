@@ -24,8 +24,6 @@ Looped.Views.CityResultsView = Backbone.View.extend({
     });
     newTipView.render();
     this.$el.append(newTipView.$el)
-    // Favorite icon enabled on home view
-    $('p[data-id="city-title"]').css('display', 'none');
     // Disable if favorited
     if (tipModel.get('favorited') === true) {
       var tipID = tipModel.get('id');
