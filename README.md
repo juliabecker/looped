@@ -2,7 +2,7 @@
 
 A single-page app for sharing city tips. Uses Facebook Oauth, Backbone, and Rails with a Postgres DB.
 
-Check it out: <a href="https://looped.herokuapp.com/">here!</a>
+Check it out <a href="https://looped.herokuapp.com/">here!</a>
 
 ##Features
 
