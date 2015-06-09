@@ -11,10 +11,10 @@ var router;
 var currentUser;
 var tips;
 var favorites;
+var cities;
 // Option variables
 var type;
 // Bootstrapped Models
-var cities = new Looped.Collections.CityCollection(allCities);
 var categories = new Looped.Collections.CategoryCollection(allCategories)
 
 Looped.initialize = function() {

@@ -9,7 +9,8 @@ Looped.Views.CityDropdownView = Backbone.View.extend({
   initialize: function(options) {
     this.$el.attr('class', 'row');
     this.collection.fetch({
-      success: function() {
+      success: function(cityData) {
+        cities = cityData
         this.render();
       }.bind(this)
     })
@@ -20,6 +21,7 @@ Looped.Views.CityDropdownView = Backbone.View.extend({
   },
   showCityResults: function() {
     var cityID = $('.ui.dropdown').dropdown('get value');
+    $('div[data-id="results-container"]').empty();
     var cityResultsView = new Looped.Views.CityResultsView({city_id: cityID})
   },
   render: function() {
