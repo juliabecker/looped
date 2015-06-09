@@ -31,10 +31,10 @@
           <i class="dropdown icon"></i>
           <div class="default text">Select City</div>
             <div data-attr="city-dropdown" class="menu">
+              <div class="item" data-value="add-new" style="font-style:italic">Add New City</div>
               <%% _.each(cities, function(city) { %>
                 <div class="item" data-value="<%%= city.id %>"><%%= city.city %>, <%%= city.country %></div>
               <%% }); %>
-                <div class="item" data-value="add-new" style="font-style:italic">Add New City</div>
             </div>
           </div>
       </div>
