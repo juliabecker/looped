@@ -26,7 +26,7 @@ Looped.Views.AddTipView = Backbone.View.extend({
         city: newCityName,
         country: newCountryName
       };
-      var newCity = new City(newCity);
+      var newCity = new Looped.Models.City(newCity);
       newCity.save(newCityData, {
         success: function(city) {
           cityID = city.get('id')
