@@ -32,7 +32,8 @@ Looped.Views.AddTipView = Backbone.View.extend({
           cityID = city.get('id')
           this.saveTip(cityID)
         }.bind(this)
-      })
+      });
+      cities.add(newCity);
     } else {
       this.saveTip(cityID)
     }

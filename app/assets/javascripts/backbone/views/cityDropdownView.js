@@ -8,7 +8,11 @@ var Looped = Looped || {
 Looped.Views.CityDropdownView = Backbone.View.extend({
   initialize: function(options) {
     this.$el.attr('class', 'row');
-    this.render();
+    this.collection.fetch({
+      success: function() {
+        this.render();
+      }.bind(this)
+    })
   },
   template: _.template($('script[data-id="city-dropdown-template"]').text()),
   events: {
