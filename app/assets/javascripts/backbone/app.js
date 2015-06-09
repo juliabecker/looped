@@ -15,7 +15,7 @@ var favorites;
 // Option variables
 var type;
 // Bootstrapped Models
-var cities = new Looped.Collections.CityyCollection(allCities);
+var cities = new Looped.Collections.CityCollection(allCities);
 var categories = new Looped.Collections.CategoryCollection(allCategories)
 
 Looped.initialize = function() {
