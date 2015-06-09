@@ -1,7 +1,8 @@
 #Looped App
 
-A single-page Facebook Oauth app for sharing city tips. Final project for General Assembly's WDI.
-Check it out: <a href="https://looped.herokuapp.com/">here</a>
+A single-page app for sharing city tips. Uses Facebook Oauth, Backbone, and Rails with a Postgres DB.
+
+Check it out: <a href="https://looped.herokuapp.com/">here!</a>
 
 ##Features
 
@@ -9,7 +10,7 @@ Check it out: <a href="https://looped.herokuapp.com/">here</a>
 
 <img src="images/login.png">
 
-- A user can view tip results by city.
+- A user can view all tip results by city.
 
 <img src="images/homescreen.png">
 
@@ -45,7 +46,20 @@ Check it out: <a href="https://looped.herokuapp.com/">here</a>
 
 <img src="images/wireframes/profile-contributed.png">
 
-
 - Add tip
 
 <img src="images/wireframes/add.png">
+
+##ERD
+
+<img src="images/erd.png">
+
+##Dependencies
+
+- **Rails**
+- **Backbone JS**
+- **Postgres**
+- **Underscore JS**
+- **jQuery**
+- **Semantic UI**
+- **HTTParty**
