@@ -1,7 +1,7 @@
 <div data-id="menu" class="ui secondary pointing menu">
   <div data-id="add-tip-button" class="ui item"></div>
   <div class="right menu">
-    <%= link_to('Login with Facebook', code_uri, class: "ui item") %>
+    <%= link_to('Log In', code_uri, class: "ui item") %>
   </div>
 </div>
 <header class="ui centered page grid">
@@ -9,7 +9,10 @@
     <a href="/#"><%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %></a>
   </div>
 </header>
+<p style="text-align:center">Want to add tips and save favorites? <%= link_to('Log in with Facebook!', code_uri) %>
+</p>
 <main id="main" class="ui centered page grid">
+
 
 <!-- Bootstrap cities & categories collections -->
 <script>
@@ -48,9 +51,6 @@
       <p data-id="city-title"><%%= city.city %><span data-id="category-title"><%%= category.title %></span></p>
       <p><%%= content %></p>
     </div>
-  </div>
-  <div class="extra rating-content" style="width:50px;height:100%">
-    <div class="ui rating" data-max-rating="1" data-id="<%%= id %>"></div>
   </div>
 </script>
 

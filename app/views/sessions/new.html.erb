@@ -3,11 +3,15 @@
     <%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %>
   </div>
   <div class="row">
+    <h2>Your app for sharing city tips.</h2>
+    <p>Log in with Facebook to create a profile, add tips, save favorites, and explore. Or continue as a guest to browse by city.</p>
+  </div>
+  <div class="row">
     <%= link_to(code_uri, :class => 'ui facebook button') do %>
-      <i style="margin-right:10px" class="fa fa-facebook"></i>Log In with Facebook
+      <i style="margin-right:10px" class="fa fa-facebook"></i>Log in with Facebook
     <% end %>
   </div>
   <div class="row">
-    <h3><a href="/">Contine as guest</a></h3>
+    <h3><a href="/">Or contine as guest</a></h3>
   </div>
 </main>
