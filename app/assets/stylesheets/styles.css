@@ -66,7 +66,6 @@
   vertical-align:center;
 }
 
-
 body {
   background-color: #fefdf3;
 }
@@ -79,6 +78,8 @@ a:hover {
   color: rgba(0, 0, 0, 0.8);
 }
 
-/*.tip.item {
-  height:80px;
-}*/
+#login-header {
+  text-align: center;
+  font-size: 13px;
+  font-weight: normal;
+}
