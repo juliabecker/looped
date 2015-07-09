@@ -15,6 +15,7 @@ Looped.Routers.Router = Backbone.Router.extend({
     'users/:id': 'userProfileView'
   },
   index: function() {
+    console.log('index hit')
     $('#main').empty();
     var cityDropdown = new Looped.Views.CityDropdownView({
       collection: cities
