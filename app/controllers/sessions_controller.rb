@@ -27,29 +27,12 @@ class SessionsController < ApplicationController
      redirect_to login_path
   end
 
-  # Helper method makes the method available to the view (we link to it from the sessions new page)
-  helper_method :code_uri
-
   FACEBOOK_CODE_URI = 'https://www.facebook.com/dialog/oauth'
   FACEBOOK_TOKEN_URI = 'https://graph.facebook.com/v2.3/oauth/access_token?'
   FACEBOOK_API_URI = 'https://graph.facebook.com/v2.3/me'
 
   #FACEBOOK_LOOPED_OAUTH_ID
   #FACEBOOK_LOOPED_OAUTH_SECRET
-
-  def redirect_uri
-    root_url[0..-2] + oauth_callback_path
-  end
-
-  def code_uri
-    query_params = "?" + URI.encode_www_form({
-      response_type: 'code',
-      client_id: FACEBOOK_LOOPED_OAUTH_ID,
-      redirect_uri: redirect_uri,
-      scope: 'public_profile,user_friends'
-    })
-    FACEBOOK_CODE_URI + query_params
-  end
 
   def request_token
     query_params = URI.encode_www_form({
