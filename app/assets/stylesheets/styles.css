@@ -67,14 +67,18 @@
 }
 
 
-/*body {
+body {
   color: #636;
   background-color: #fefdf3;
 }
 
 a {
-  color: #6a00cc;
-}*/
+  color: rgba(0, 0, 0, 0.6);
+}
+
+a:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
 
 /*.tip.item {
   height:80px;

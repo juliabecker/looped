@@ -1,0 +1,57 @@
+<div data-id="menu" class="ui secondary pointing menu">
+  <div data-id="add-tip-button" class="ui item"></div>
+  <div class="right menu">
+    <%= link_to('Login with Facebook', code_uri, class: "ui item") %>
+  </div>
+</div>
+<header class="ui centered page grid">
+  <div class="row">
+    <a href="/#"><%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %></a>
+  </div>
+</header>
+<main id="main" class="ui centered page grid">
+
+<!-- Bootstrap cities & categories collections -->
+<script>
+  var allCategories = <%=j @categories.to_json.html_safe %>
+  var allCities = <%=j @cities.to_json.html_safe %>
+</script>
+
+<!-- City Dropdown Template -->
+<script type="text/template" data-id="city-dropdown-template">
+  <div class="eleven wide column">
+    <div data-id="city-dropdown" class="ui fluid search selection dropdown">
+      <input type="hidden" name="country">
+        <i class="dropdown icon"></i>
+          <div class="default text">Select City</div>
+          <div data-attr="city-dropdown" class="menu">
+            <%% _.each(cities, function(city) { %>
+              <div class="item" data-value="<%%= city.id %>"><%%= city.city %>, <%%= city.country %></div>
+            <%% }); %>
+          </div>
+    </div>  
+  </div>
+  <div class="eleven wide column">
+    <div data-id="results-container" class="ui very relaxed celled list"></div>
+  </div>
+</script>
+
+  
+<!-- Tip Results List Item Template -->
+<script type="text/template" data-id="tip-result-template">
+  <div id="tip-avatar">
+    <img class="ui avatar image" src="<%%= user.picture %>">
+    <p id="tip-user-name"><%%= user.name %></p>
+  </div>
+  <div style="vertical-align:center" class="middle aligned content" style="width: 80%">
+    <div class="description">
+      <p data-id="city-title"><%%= city.city %><span data-id="category-title"><%%= category.title %></span></p>
+      <p><%%= content %></p>
+    </div>
+  </div>
+  <div class="extra rating-content" style="width:50px;height:100%">
+    <div class="ui rating" data-max-rating="1" data-id="<%%= id %>"></div>
+  </div>
+</script>
+
+<%= javascript_include_tag 'guest_application' %>

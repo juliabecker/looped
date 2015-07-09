@@ -1,13 +1,13 @@
 <main class="ui centered page grid">
   <div class="row">
-    <a href="/"><%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %></a>
-  </div>
-  <div class="row">
-    <h3>Log in to share city tips with friends</h3>
+    <%= image_tag("looped_logo.png", :id => "logo", :alt => "Looped") %>
   </div>
   <div class="row">
     <%= link_to(code_uri, :class => 'ui facebook button') do %>
       <i style="margin-right:10px" class="fa fa-facebook"></i>Log In with Facebook
     <% end %>
+  </div>
+  <div class="row">
+    <h3><a href="/">Contine as guest</a></h3>
   </div>
 </main>

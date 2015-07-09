@@ -24,16 +24,12 @@
 //= require semantic.js
 
 //= require_tree ./backbone/models/
-//= require_tree ./backbone/collections/
-//= require ./backbone/app
-//= require ./backbone/views/menuView.js
-//= require ./backbone/views/tipView.js
-//= require ./backbone/views/addTipView.js
+//= require ./backbone/collections/categoriesCollection
+//= require ./backbone/collections/citiesCollection
+//= require ./backbone/collections/tipsCollection
+//= require ./backbone/guest_app
+//= require ./backbone/views/guestTipView.js
 //= require ./backbone/views/cityResultsView.js
 //= require ./backbone/views/cityDropdownView.js
-//= require ./backbone/views/contributedResultsView.js
-//= require ./backbone/views/favoriteResultsView.js
 
-//= require ./backbone/views/userProfileView.js
-
-// = require ./backbone/router/router
+// = require ./backbone/router/guest_router

@@ -6,7 +6,7 @@ class WelcomeController < ApplicationController
       @categories = Category.all
       render :index
     else
-      redirect_to login_path
+      render :guest_index
     end
   end
 end
